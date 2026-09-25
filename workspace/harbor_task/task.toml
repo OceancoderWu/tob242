@@ -1,0 +1,19 @@
+# Example teaching layout. Native Harbor schema/integration still requires validation.
+[task]
+name = "rcc8_cross_length_generalization"
+version = "0.1.0"
+description = "Improve relational graph classification on the original RCC-8 paper benchmark."
+metric = "score"
+metric_direction = "maximize"
+time_limit_seconds = 21600
+
+[resources]
+cpu_cores = 8
+memory_mb = 16384
+gpu_count = 1
+network_access = false
+
+[entrypoint]
+solution_script = "solution/solve.sh"
+grader_script = "tests/grader.py"
+test_script = "tests/test.sh"

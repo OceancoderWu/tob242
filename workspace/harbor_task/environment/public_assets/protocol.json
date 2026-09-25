@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "epochs": 40,
+  "batch_size": 128,
+  "eval_batch_size": 128,
+  "hidden_dim": 32,
+  "num_steps": 9,
+  "optimizer": "Adam",
+  "lr": 0.01,
+  "weight_decay": 0.0,
+  "checkpoint_rule": "max validation accuracy; ties earliest",
+  "split": "torch random_split 80/20 per seed before model initialization",
+  "primary_metric": "all24_macro_accuracy",
+  "secondary_metric": "ood15_macro_accuracy",
+  "facets_reference": 4,
+  "margin_reference": 1,
+  "negatives_reference": 1,
+  "max_parameters": 2000000
+}

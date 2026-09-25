@@ -1,0 +1,18 @@
+{
+  "status": "design_prepared; execution_stopped_at_user_request",
+  "paper_protocol": "See PROTOCOL_ALIGNMENT.md",
+  "reference_parity": "previous small-sample GPU check passed; result file remains on GPU server",
+  "paired_benchmark": "stopped; partial runs are not formal evidence",
+  "docker_build": "stopped before completion",
+  "gpu_container_validation": "not_run",
+  "harbor_validation": "not_run",
+  "agent_trajectories": "not_run",
+  "formal_release_approved": false,
+  "static_contract_checks": "3 passed; original dataset hashes verified; no new GPU benchmark",
+  "source_audit": "official GitHub commit pinned; reference model AST parity passed",
+  "baseline_lineage": "prior GPU-trained R-GCN model structure matched statically",
+  "eval_audit": "paper Figure 4 per-group accuracy and author argmax/count method matched by source review; no new full benchmark",
+  "gpu_reference_comparison": "local reference SHA-256 equals uploaded GPU adapted method; prior trained GPU model used separate author runtime module",
+  "asset_layout": "training CSV in Agent image; 24 original test CSV moved to evaluation_assets/data for evaluator-side mounting",
+  "deployment_isolation": "not validated; evaluator and candidate currently share a Python process"
+}

@@ -1,0 +1,17 @@
+{
+  "repository": "https://github.com/erg0dic/gnn-sg",
+  "commit": "525b9e132aadf76b373e488a9e7e7b255493b6d2",
+  "sha256": {
+    "LICENSE": "9a3ab1abdba8880ec0fe87decac9f364f4bb929b583ce5362e4bb8d07d209459",
+    "README.md": "eb4e8dd92900c87d4d42ea07b45e567963609ab380012f31828020de7cb1cb2b",
+    "configs/config.yaml": "ffa42b5efbcc1429f248a3495b9a4ee0fb149c9675d11b6661a9e8f3b6ac62ca",
+    "configs/experiments/fb_model.yaml": "f5280954013188e6e3019a2c8e3605b1ae3b8cd15f30f7e5f96029a9ce42d4e3",
+    "configs/experiments/fb_model_graphlog.yaml": "a8aac1ed0cc02d667bba105566140688a356de8b5d490dc43ce122bf5975bfd2",
+    "configs/experiments/fb_model_interval.yaml": "d8a1af0d64c0c88a1ca24cc430c78dbb38cf44408af50c26b7cc3604752c5902",
+    "configs/experiments/fb_model_rcc8.yaml": "91408001333f2c78bf4fd9ac1059892d68463b98e876acf4bbe3d6d37ecb56ba",
+    "src/model_nbf_general.py": "39f8251e6f0ca854073ac68e4f4c42b9e32c905a958a07c1d605a93c6b86181a",
+    "src/model_nbf_fb.py": "c8679d4b8c700802f982bc835434869070bd88a3941fcbe57c16dc9d093af824",
+    "src/utils.py": "f8f02edea572a2eb68ceab188b44633b6a80c3c69aa151d0a72996c2e6877faf",
+    "src/train.py": "391b06629c7fcbd50b3b570703c280781b93a3e8b96f199943b845d0ad79d55a"
+  }
+}

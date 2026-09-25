@@ -1,0 +1,25 @@
+{
+  "task_id": "tob242_rcc8",
+  "task_type": "S1",
+  "optimization_surface": "关系图模型结构、消息计算、聚合、查询读出和损失",
+  "baseline": "R-GCN adaptation; not verified author baseline",
+  "reference": "EpiGNN-min adapted from author source",
+  "isolation": {
+    "reference_in_agent_image": false,
+    "dataset_public": true,
+    "unpublished_hidden": false
+  },
+  "score_contract": {
+    "metric": "all24_macro_accuracy",
+    "direction": "maximize",
+    "formula": "(A-B)/(1-B)",
+    "seeds": [
+      42,
+      43,
+      44
+    ],
+    "baseline_raw": null,
+    "reference_raw": null
+  },
+  "status": "preparation"
+}
