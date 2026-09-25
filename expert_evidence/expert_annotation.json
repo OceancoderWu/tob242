@@ -14,9 +14,7 @@
     "direction": "maximize",
     "formula": "(A-B)/(1-B)",
     "seeds": [
-      42,
-      43,
-      44
+      42
     ],
     "baseline_raw": null,
     "reference_raw": null

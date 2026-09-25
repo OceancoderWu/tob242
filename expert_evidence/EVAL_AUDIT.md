@@ -13,9 +13,9 @@
 | 组内准确率 | `utils.get_acc`: `argmax(axis=1)` 与目标标签逐项比较，再除以样本数；`train.get_batched_test_out` 对 batch 按样本数加权 | `tests/train_eval.evaluate` 逐 batch 计正确题数，除以该文件总题数 | 数学上完全同一组内 accuracy |
 | 测试 batch | 作者配置 128，`DataLoader(..., shuffle=True)` | 固定 128，按原文件顺序迭代 | 准确率对样本顺序不敏感；不承诺浮点逐 bit 一致 |
 | checkpoint 选择 | 验证准确率严格提高才更新，平局留最早 epoch | `train_eval.py` 同规则；本包从 1 计 epoch，作者从 0 计 | 选择准则对应 |
-| 重复和报告 | Figure 4 为 3 次运行的逐 k/b accuracy 曲线及 2σ 区间 | 24 组逐组报告 3 seed mean、2σ | 报告维度对应；作者实际三个随机 seed 未公开，本包预先声明 42/43/44 |
+| 重复和报告 | Figure 4 为 3 次运行的逐 k/b accuracy 曲线及 2σ 区间 | 固定 seed 42，24 组逐组报告单次 accuracy | 测试题和组内 accuracy 对应，但重复次数及 2σ 报告不再与论文一致 |
 | 标量分数 | 论文 Figure 4 没有 `(A-B)/(1-B)` | AutoResearch 额外用 24 组宏平均和实测 R-GCN 锚点生成 score | **这是题目平台评分约定，不能称论文原 Eval 指标** |
 
 **结论：** 原始题目、每个 `(k,b)` 的 accuracy 定义、验证选点规则与论文 Figure 4 对齐。数据容器、类别 ID 顺序、测试样本顺序、随机序列和额外的 AutoResearch 标量汇总不是作者逐 bit 的执行方式。论文正文与作者当前配置的 facets、优化器存在冲突，见 `PROTOCOL_ALIGNMENT.md`。因此可以声称“同一论文 benchmark 的逐组评测”，不能声称“论文原代码原环境逐 bit 复现”或把平台 score 当作论文 accuracy。
 
-当前只完成源码、协议、文件哈希和小样本 Reference 适配核查。完整三 seed 训练、全量 checkpoint 重载与论文数值对照需要后续明确进入试跑阶段。
+当前只完成源码、协议、文件哈希和小样本 Reference 适配核查。当前单 seed 协议的完整训练、全量 checkpoint 重载与论文数值对照需要后续明确进入试跑阶段；单次结果不能复现论文的三次均值与误差区间。

@@ -1,0 +1,537 @@
+{
+  "status": "STATIC_READY",
+  "scope": "Read-only file/schema/syntax inspection; no model execution or experiment",
+  "checks": [
+    {
+      "name": "harbor_mode",
+      "passed": true,
+      "detail": "Harbor verifier must use a separate container"
+    },
+    {
+      "name": "artifact_boundary",
+      "passed": true,
+      "detail": "Only method.py is declared; test.sh rejects nonempty convention artifacts"
+    },
+    {
+      "name": "resource_contract",
+      "passed": true,
+      "detail": "One GPU, no runtime network, root verifier"
+    },
+    {
+      "name": "seed_contract",
+      "passed": true,
+      "detail": "One predeclared seed for training and formal evaluation"
+    },
+    {
+      "name": "agent_starter",
+      "passed": true,
+      "detail": "Agent image initializes its candidate from the public R-GCN starter"
+    },
+    {
+      "name": "oracle_reference",
+      "passed": true,
+      "detail": "Private Oracle method matches the expert Reference"
+    },
+    {
+      "name": "oracle_no_argument_entry",
+      "passed": true,
+      "detail": "Harbor Oracle can invoke solve.sh with no positional arguments"
+    },
+    {
+      "name": "agent_instruction.md",
+      "passed": true,
+      "detail": "Agent receives the task instruction"
+    },
+    {
+      "name": "verifier_instruction.md",
+      "passed": true,
+      "detail": "Verifier instruction mirror matches"
+    },
+    {
+      "name": "verifier_starter_method.py",
+      "passed": true,
+      "detail": "Starter mirror matches"
+    },
+    {
+      "name": "verifier_starter_solve.sh",
+      "passed": true,
+      "detail": "Starter mirror matches"
+    },
+    {
+      "name": "requirements_mirror",
+      "passed": true,
+      "detail": "Agent and Verifier dependencies match"
+    },
+    {
+      "name": "agent_dockerfile_mirror",
+      "passed": true,
+      "detail": "Verifier contract copy matches Agent Dockerfile"
+    },
+    {
+      "name": "runner_train_eval.py",
+      "passed": true,
+      "detail": "Agent and Verifier public runner mirrors match the trusted source"
+    },
+    {
+      "name": "runner_data.py",
+      "passed": true,
+      "detail": "Agent and Verifier public runner mirrors match the trusted source"
+    },
+    {
+      "name": "runner_security.py",
+      "passed": true,
+      "detail": "Agent and Verifier public runner mirrors match the trusted source"
+    },
+    {
+      "name": "runner_score.py",
+      "passed": true,
+      "detail": "Agent and Verifier public runner mirrors match the trusted source"
+    },
+    {
+      "name": "asset_DATASET_README.md",
+      "passed": true,
+      "detail": "Public asset has an identical Verifier copy"
+    },
+    {
+      "name": "asset_DATA_ATTRIBUTION.md",
+      "passed": true,
+      "detail": "Public asset has an identical Verifier copy"
+    },
+    {
+      "name": "asset_LICENSE.code-upstream",
+      "passed": true,
+      "detail": "Public asset has an identical Verifier copy"
+    },
+    {
+      "name": "asset_data/train_rcc8.csv",
+      "passed": true,
+      "detail": "Public asset has an identical Verifier copy"
+    },
+    {
+      "name": "asset_manifest.json",
+      "passed": true,
+      "detail": "Public asset has an identical Verifier copy"
+    },
+    {
+      "name": "asset_protocol.json",
+      "passed": true,
+      "detail": "Public asset has an identical Verifier copy"
+    },
+    {
+      "name": "dataset_manifest",
+      "passed": true,
+      "detail": "One train CSV and all 24 paper benchmark groups"
+    },
+    {
+      "name": "hash_train_rcc8.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "hash_test_rcc8_k_2_b_1.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_2_b_1.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_2_b_2.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_2_b_2.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_2_b_3.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_2_b_3.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_3_b_1.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_3_b_1.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_3_b_2.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_3_b_2.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_3_b_3.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_3_b_3.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_4_b_1.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_4_b_1.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_4_b_2.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_4_b_2.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_4_b_3.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_4_b_3.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_5_b_1.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_5_b_1.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_5_b_2.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_5_b_2.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_5_b_3.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_5_b_3.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_6_b_1.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_6_b_1.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_6_b_2.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_6_b_2.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_6_b_3.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_6_b_3.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_7_b_1.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_7_b_1.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_7_b_2.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_7_b_2.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_7_b_3.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_7_b_3.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_8_b_1.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_8_b_1.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_8_b_2.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_8_b_2.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_8_b_3.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_8_b_3.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_9_b_1.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_9_b_1.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_9_b_2.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_9_b_2.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "hash_test_rcc8_k_9_b_3.csv",
+      "passed": true,
+      "detail": "Original CSV matches frozen SHA-256"
+    },
+    {
+      "name": "upstream_hash_test_rcc8_k_9_b_3.csv",
+      "passed": true,
+      "detail": "Verifier copy matches the expert source CSV"
+    },
+    {
+      "name": "agent_excludes_tests",
+      "passed": true,
+      "detail": "Agent image context has no test CSV"
+    },
+    {
+      "name": "reference_outside_task",
+      "passed": true,
+      "detail": "Reference is outside both Harbor build contexts"
+    },
+    {
+      "name": "docker_context_environment",
+      "passed": true,
+      "detail": "All local COPY sources exist inside their native context"
+    },
+    {
+      "name": "no_context_symlink_escape_environment",
+      "passed": true,
+      "detail": "Build context contains no symlink escaping its root"
+    },
+    {
+      "name": "docker_context_tests",
+      "passed": true,
+      "detail": "All local COPY sources exist inside their native context"
+    },
+    {
+      "name": "no_context_symlink_escape_tests",
+      "passed": true,
+      "detail": "Build context contains no symlink escaping its root"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/tests/grader.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/tests/security.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/tests/test_contract.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/tests/inference_worker.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/tests/rescore_checkpoint.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/tests/data.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/tests/train_eval.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/tests/score.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/tests/verifier_env/starter/method.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/tests/verifier_env/public_runner/security.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/tests/verifier_env/public_runner/data.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/tests/verifier_env/public_runner/train_eval.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/tests/verifier_env/public_runner/score.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/solution/method.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/environment/starter/method.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/environment/public_runner/security.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/environment/public_runner/data.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/environment/public_runner/train_eval.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/environment/public_runner/score.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_expert_evidence/package_run.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_expert_evidence/audit_reference_source.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_expert_evidence/summarize.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_expert_evidence/audit_rgcn_lineage.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_expert_evidence/check_reference.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_expert_evidence/evidence_io.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_expert_evidence/preflight.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    }
+  ],
+  "pending_runtime_evidence": [
+    "measured Baseline/Reference anchors and paired GPU evidence",
+    "two real Agent research trajectories",
+    "single-seed protocol cannot establish tutorial 3-sigma randomness gate",
+    "GPU image build, permission probe, full Harbor Trial, resource and 12h checks"
+  ]
+}

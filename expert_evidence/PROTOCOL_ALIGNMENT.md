@@ -23,8 +23,8 @@
 | 传播 | 9 轮；Reference 各轮共享参数 | F.5.2 / 发布模型 |
 | Reference loss | margin=1，1 negative，cross-entropy distance | Table 11 / 发布损失函数 |
 | Baseline loss | cross entropy | 用户明确允许各自损失 |
-| 重复次数 | 3，seeds 42/43/44 | 论文报告 3 次；准确 seed 列表未知，不能称完全相同 |
-| 报告 | 每组 mean ± 2σ；全部 24 组 | Figure 4，σ计算约定单独披露 |
+| 重复次数 | 1，固定 seed 42 | 用户选择单 seed；论文报告 3 次，本题不能复现其误差区间 |
+| 报告 | 每组单次 accuracy；全部 24 组 | 组内指标与 Figure 4 对应，跨运行统计不对应 |
 
 ## 必须披露的适配与局限
 
@@ -40,6 +40,6 @@
 
 ## 验收原则
 
-原始 benchmark 优先，不为制造分差削弱 Baseline，不换测试题，不根据 Reference 分数反推评分上界。若三 seed Reference 归一化分数不在教程的 [0.15,0.8]，或收益不够 3 倍 Baseline 样本标准差，明确记录不通过；保持数据与结果，并与出题方决定是否接受此公开复现题。
+原始 benchmark 优先，不为制造分差削弱 Baseline，不换测试题，不根据 Reference 分数反推评分上界。当前固定 seed 42；若 Reference 归一化分数不在 [0.15,0.8] 或没有严格优于 Baseline，明确记录不通过。单 seed 不能计算 Baseline 样本标准差，因而不能满足教程的 `3σ_B` 随机性质量门；须由任务方明确接受这一偏离。保持数据与结果，不根据分数改 seed 或评分上界。
 
-正式 10h×2 Agent 研究轨迹和实际 Harbor 平台验证仍需真实运行，不能从模板生成假结果。当前 `task.toml` 沿用 Example 教学结构，不宣称它已满足安装版本 Harbor 的原生 schema。
+正式 10h×2 Agent 研究轨迹和实际 Harbor 平台验证仍需真实运行，不能从模板生成假结果。当前独立 Verifier 版 `task.toml` 已按本机 Harbor 0.23.0 原生 schema 改写并通过静态加载；此前的 `shared` 版曾通过 dry-run，当前版尚未执行。镜像构建、GPU 正式评分及平台隔离尚未完成动态验证。

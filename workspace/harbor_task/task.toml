@@ -1,19 +1,31 @@
-# Example teaching layout. Native Harbor schema/integration still requires validation.
+schema_version = "1.4"
+
 [task]
-name = "rcc8_cross_length_generalization"
-version = "0.1.0"
-description = "Improve relational graph classification on the original RCC-8 paper benchmark."
-metric = "score"
-metric_direction = "maximize"
-time_limit_seconds = 21600
+name = "autoresearch/rcc8-cross-length-generalization"
+version = "0.3.0"
+description = "Improve RCC-8 relation prediction on the original STaR benchmark."
 
-[resources]
-cpu_cores = 8
+[metadata]
+category = "machine-learning"
+difficulty_explanation = "Method-level graph reasoning search with one fixed training seed."
+
+[environment]
+cpus = 8
 memory_mb = 16384
-gpu_count = 1
-network_access = false
+storage_mb = 102400
+gpus = 1
+build_timeout_sec = 3600
+network_mode = "no-network"
+workdir = "/workspace"
 
-[entrypoint]
-solution_script = "solution/solve.sh"
-grader_script = "tests/grader.py"
-test_script = "tests/test.sh"
+[agent]
+timeout_sec = 43200
+
+[verifier]
+timeout_sec = 25200
+user = "root"
+environment_mode = "separate"
+
+[[artifacts]]
+source = "/workspace/solution/method.py"
+destination = "submitted_method.py"

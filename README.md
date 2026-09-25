@@ -1,63 +1,50 @@
-# ToB 242：论文 RCC-8 benchmark 的 AutoResearch 准备包
+# ToB 242 RCC-8 AutoResearch 任务包
 
-本包按 Example 的目录与八章节题面组织，使用论文原始数据和测试题，目标是改进短链训练到长链测试的关系推理泛化。Baseline 是 R-GCN 适配，Reference 是作者 EpiGNN-min 适配。它是准备中的任务设计与评测实现草案；最终验收状态见 `expert_evidence/run_summary.json`，不能仅因目录齐全就称正式任务通过。
+本包使用作者发布的原始训练 CSV 和 Figure 4 对应的 24 组 RCC-8 测试 CSV。Agent 改进 `/workspace/solution/method.py` 中的图关系推理方法；训练和评分协议由任务固定。论文逐组 accuracy 与本题测试题一致；全 24 组宏平均和归一化 `score=(A-B)/(1-B)` 是 AutoResearch 新增的标量合同。Baseline 是查询感知 R-GCN 适配，Reference 是作者 EpiGNN-min 适配，二者并非论文代码逐 bit 复现。
 
-## 目录
+## 当前状态
 
-- `workspace/harbor_task/instruction.md`：给 Agent 的题面。
-- `workspace/harbor_task/solution/method.py`：R-GCN 起点；Agent 唯一可修改文件。
-- `workspace/harbor_task/tests/`：统一训练、评分、静态边界检查、verifier。
-- `workspace/harbor_task/environment/public_assets/`：原始训练 CSV、数据哈希清单和冻结协议；Agent 镜像只复制这部分。
-- `evaluation_assets/data/`：原始 24 个测试 CSV，由评分侧单独挂载到 `/opt/benchmark/data`，不复制进 Agent 镜像。
-- `workspace/reference/`：出题者保管的 EpiGNN-min，不进入 Agent 镜像。
-- `optimization_evidence/`：预留成对三 seed 训练证据的位置；本次没有正式结果或锚点。
-- `expert_evidence/PROTOCOL_ALIGNMENT.md` 与 `EVAL_AUDIT.md`：逐项论文对应、作者 Eval 核查、正文/代码冲突和复现局限。
-- `expert_evidence/SOURCE_PROVENANCE.md` 与 `BASELINE_LINEAGE.md`：Reference 官方源码和服务器已训练 R-GCN 起点的来源核查。
-- `expert_evidence/package_audit/PREPARATION_CHECKLIST.md`：与 Example 的逐项准备对照。
-- `expert_evidence/upstream/`：用于核对的上游源码快照，非 Agent 内容。
+评分代码、公开验证入口和 Harbor 0.23.0 配置已完成静态接线，**正式投放仍待真实 GPU 证据**。正式协议现为固定 seed 42；`optimization_evidence/` 当前没有该协议的 Baseline/Reference 成对结果、checkpoint 和测得的锚点。`tests/anchors.json` 只有通过正式证据质量门后才由 `expert_evidence/summarize.py` 生成。两条 Agent 轨迹也未开展。不要把当前包或历史单 seed 试跑标成验收通过。
 
-## 核心协议
+本轮仅修准备工作，未启动任何实验。逐项静态结果见 `expert_evidence/package_audit/static_preflight.json`，修复与待实验项见 `expert_evidence/package_audit/PREPARATION_REVIEW.md`。
 
-原始 train_rcc8.csv 57,600 行；每 seed 80/20 原始行划分；测试全部 k=2–9 × b=1–3，共 153,600 题。40 epochs、batch 128、hidden 32、9 轮、Adam lr=.01、wd=0；验证准确率最高且平局最早。Reference facets=4、margin=1、1 negative；Baseline 保留交叉熵。seeds 为预先固定的 42/43/44，作者具体 seed 列表未公开。
+## 目录边界
 
-报告全部 24 组的三次均值和 2σ。评分主指标为全部 24 组宏平均；15 组长链均值另报。本包的归一化 score 是 AutoResearch 合同，不是论文指标。论文正文与代码存在 facets/优化器差异，本包优先正文，见对应表。
+- `workspace/harbor_task/`：交给 Harbor 的任务根。Agent 镜像从 `environment/` 构建，包含公开训练 CSV、只读公开训练器和 R-GCN 起点。
+- `workspace/harbor_task/solution/`：仅 Harbor Oracle 调用的私有 Reference 方法与无参入口；常规 Agent 镜像中的 `/workspace/solution/method.py` 仍从 R-GCN Starter 初始化。
+- `workspace/harbor_task/tests/benchmark_data/`：原始 24 个公开测试 CSV 的 Verifier 侧副本。Harbor 从 `tests/Dockerfile` 构建独立评分镜像；测试目录在镜像构建时即设为 root 独占，候选训练与推理以 `researcher` 运行，测试标签只在 root 评分进程中使用。
+- `workspace/harbor_task/tests/hidden_assets/`：交付时为空。原始论文测试题已公开，本题不声称另有未公开 Hidden。
+- `workspace/reference/`：出题方私有 Reference，不在 Agent 构建上下文。
+- `optimization_evidence/`：全部正式 Baseline/Reference seed 的训练、模型、重载和统计材料。
+- `expert_evidence/`：来源审计、协议说明、出题记录及未来两条 Agent 轨迹。
 
-公开原题不等于独立未公开 Hidden。本包不会为了“隐藏”生成新题。若平台要求未公开测试集，必须先解决与“原始论文题目”之间的要求冲突。
+## 本地与 Harbor 检查
 
-## 未来试跑入口（本次不执行）
-
-推荐 Linux x86_64 / CUDA 11.8 兼容驱动 / 24 GiB GPU。真实预跑环境记录在各运行 `provenance.json`。本地 macOS 只能做静态校验/容器构建，不能替代 GPU 端到端验证。
+本机已用 Harbor 0.23.0 的 `TaskConfig.model_validate_toml` 加载当前 `task.toml`；旧 `shared` 配置曾通过 dry-run，但不能作为当前独立 Verifier 配置的运行证据。目标环境是 Linux x86_64、CUDA 11.8 兼容 GPU。原生 Docker provider 分别以 `environment/` 和 `tests/` 为 Agent、Verifier 构建上下文：
 
 ```bash
-# 当前目录为 tob242；不覆盖已有输出。
-PYTHON=/path/to/python DATA=$PWD/workspace/harbor_task/environment/public_assets/data TEST_DATA=$PWD/evaluation_assets/data bash expert_evidence/run_pair.sh
-# 完成六次训练与六次独立重载后，自动生成 comparison_summary.json 和 anchors.json。
+docker build --platform linux/amd64 -t tob242-rcc8:0.2 -f workspace/harbor_task/environment/Dockerfile workspace/harbor_task/environment
+docker build --platform linux/amd64 -t tob242-rcc8-verifier:0.2 -f workspace/harbor_task/tests/Dockerfile workspace/harbor_task/tests
 ```
 
-单次 smoke 和重载：
+公开迭代在 Agent 容器中运行，不需测试文件与锚点：
 
 ```bash
-python workspace/harbor_task/tests/train_eval.py \
-  --method workspace/harbor_task/solution/method.py --seed 42 \
-  --output output/smoke001 --test-data ../../evaluation_assets/data --smoke
-python workspace/harbor_task/tests/train_eval.py \
-  --method workspace/harbor_task/solution/method.py --seed 42 \
-  --output output/reload001 --test-data ../../evaluation_assets/data --reload optimization_evidence/baseline_runs/seed_42/best.pt
+bash /workspace/solution/solve.sh /workspace/output/dev42 42
+python /workspace/tests/train_eval.py --method /workspace/solution/method.py --seed 42 --smoke --output /workspace/output/smoke42
 ```
 
-## 未来容器与部署（本次不执行）
+正式 Harbor Verifier 在独立容器运行 `/tests/test.sh`。Harbor 只转交 Agent 最终的 `/workspace/solution/method.py` artifact；Verifier 固定该文件权限，再用 root 读取测试数据，按固定 seed 42 从头训练候选并经低权限推理进程取得预测，最后原子写 `/logs/verifier/reward.txt`。所有测试文件会校验 SHA-256；模型代码和测试标签不在同一进程。公开题库本身可能被外部获得，这一运行隔离不能改变原始数据的公开性质。
+
+## 正式证据生成
+
+在有 GPU 的受控环境、与任务相同的软件和数据版本下运行：
 
 ```bash
-cd workspace/harbor_task
-docker build --platform linux/amd64 -t tob242-rcc8:prep -f environment/Dockerfile .
+cd tob242
+PYTHON=/path/to/python bash expert_evidence/run_pair.sh
 ```
 
-可信评测宿主提供只读 `anchors.json` 和原始测试 CSV，分别挂载到 `/opt/benchmark/anchors.json`、`/opt/benchmark/data`；挂载可写日志与输出目录。必须通过宿主强制 `--network none --gpus device=0 --cpus 8 --memory 16g --pids-limit 256 --cap-drop ALL --security-opt no-new-privileges` 及总时限，并检查持久化输出文件的权限。不要把 `workspace/reference`、出题者源码或正式训练 checkpoint 放入 Agent 镜像。
+脚本以 seed 42 分别从头训练 Baseline 和 Reference，独立重载，对齐数据划分并生成规范 `result.json`、日志、`model/`。`summarize.py` 复算单次主指标、改善和归一化 Reference 分数。仅当两次训练完整、Reference 严格优于 Baseline 且归一化分数处于 `[0.15,0.8]` 时，才部署测得的 `tests/anchors.json`。单 seed 无法估计随机波动，也不能满足原教程的 `3σ_B` 证据要求；失败结果保留，不能换 seed 或调上界制造通过。
 
-当前 Dockerfile 为同进程 Python 训练器提供非 root 运行环境。原始测试 CSV 已从 Agent 镜像移出，计划由评分侧挂载。AST 检查不是对恶意 Python 的可靠沙箱，模型与评测器仍同进程；正式对抗性评测还需平台进程/文件隔离、可信指标复测。只读挂载不能防止同进程读取公开答案，行为约束不能替代这一局限的披露。
-
-`tests/test.sh` 只做无 GPU 的准备结构检查；未来正式评分入口为 `tests/verify.sh`，它在完整 grader 通过后写 `/logs/verifier/reward.txt`。缺锚点/超时/错误不会写伪造的零分成功。`task.toml` 是 Example 教学格式，实际 Harbor 原生配置与执行仍需验证。
-
-## 正式发布的剩余门槛
-
-本次仅交付设计与准备文件。此前启动的成对训练已按用户要求停止；其残留文件不得作为正式锚点。未来若决定进入试跑阶段，再按冻结协议完成六次训练及 checkpoint 复测，并核定 Reference 分差、耗时、显存、容器与平台验收。正式 Agent 研究轨迹也尚未开展。记录真实失败，不通过修改题库或倒推评分上限制造通过。
+锚点生成后，还需实测 Docker 构建、GPU 完整评分、Harbor Trial、资源/时长、容器 12 小时稳定性和两条各至少 10 小时有效研究轨迹。最终状态以 `expert_evidence/run_summary.json` 和真实运行材料为准。
