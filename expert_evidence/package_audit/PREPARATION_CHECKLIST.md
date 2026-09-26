@@ -1,23 +1,20 @@
 # ToB 242 交付检查表
 
-此表记录实际状态，不以目录存在代替运行证据。
+本轮只检查和修复准备工作；没有开展任何模型实验或 Harbor Trial。
 
-`python3 expert_evidence/preflight.py --report expert_evidence/package_audit/static_preflight.json` 已完成只读检查；结果 `STATIC_READY` 只表示准备文件自洽，不表示任何实验或平台验收通过。
+| 检查项 | 状态 |
+|---|---|
+| 目标、唯一可改方法文件、单 seed 42、公开/正式指标 | 已写入题面并经静态核对 |
+| 原始训练与 24 组测试 CSV、SHA-256 | 静态核对通过 |
+| 本机 Harbor/Docker CPU 镜像配置 | Harbor 0.23.0 schema 解析通过；尚未 build |
+| Agent→远端公开训练 SSH 桥 | 脚本与远端目录已部署；key 权限非训练检查通过；尚未运行训练 |
+| Agent 可执行任意远端命令但不获 root | 非训练命令与 PTY 检查通过；远端身份为 `researcher` |
+| 独立 Verifier→远端正式评分 SSH 桥 | 脚本与 root key 已部署；尚未运行评分 |
+| 远端 Python/CUDA 依赖 | `researcher` 下导入 PyTorch/PyG/scatter 通过；尚未训练 |
+| 静态预检和合同检查 | 109/109 与 3/3 通过 |
+| Baseline/Reference 单 seed 成对证据、可信锚点 | 未生成；正式 reward 当前不可用 |
+| Docker build、完整 Harbor Trial、12h 稳定性 | 未运行 |
+| 两条 Agent 研究轨迹 | 未运行 |
+| 原教程 `3σ_B` 随机性门槛 | 单 seed 无法验证，需任务方接受此协议偏离 |
 
-| 检查项 | 当前状态 | 证据或下一步 |
-|---|---|---|
-| 三目录职责、八章节题面、Starter/Reference 分离 | 已实现，静态检查 | `workspace/harbor_task/`、`workspace/reference/`、`instruction.md` |
-| 原始训练与 24 组测试数据 | 文件和哈希已核对 | `manifest.json`、`tests/benchmark_data/`；测试集公开，不称为新 Hidden |
-| Public/Dev 可用入口 | 已实现，未做 GPU 动态验证 | `solution/solve.sh` → `--public-dev`，不读取测试 CSV |
-| Harbor 原生配置 | 当前独立 Verifier 版通过本机 0.23.0 schema 静态加载；未运行本版 dry-run | `task.toml`；目标平台版本若不同需重新验证 |
-| Docker 原生构建路径 | Agent 与独立 Verifier 两套 context 已接线，未实际 build | `environment/Dockerfile`、`tests/Dockerfile`、两套公开资产镜像 |
-| Verifier 入口与 reward | 代码已接通，未做 GPU Trial | `/tests/test.sh` → `grader.py` → 原子 reward.txt |
-| 测试标签与候选隔离 | 独立 Verifier、root/普通用户进程分离已实现，未在目标容器验证 | `task.toml` artifact、`tests/Dockerfile`、`grader.py`、`inference_worker.py` |
-| Baseline/Reference 真实成对训练 | 未运行 | 固定 seed 42 各自训练、重载和规范证据 |
-| Reference [0.15,0.8] 与正向改善 | 未验证 | `comparison_summary.json` 完整原始结果复算后判断 |
-| 教程的随机性质量门 | 无法按单 seed 验证 | `3σ_B` 需要多次 Baseline 训练；任务方须接受该偏离 |
-| 正式评分锚点 | 未生成 | 通过质量门后由 `summarize.py` 部署 `tests/anchors.json` |
-| 两条 Agent 有效研究轨迹 | 未运行 | 两种模型组合各至少 10h，有效时长和结果凭真实日志填写 |
-| 12h 容器稳定性、资源和 Harbor 正式 Trial | 未运行 | 目标 GPU/Linux 平台构建与长时验证 |
-
-`tests/hidden_assets/` 在交付时为空；若平台另要求真正未公开测试题，须先决定是否允许偏离论文原始测试集。正式发布仍需真实运行证据，并由任务方处理单 seed 与教程随机性质量门不一致的问题。
+当前状态是**准备文件和远端权限已接线，正式运行尚待实验阶段验收**。具体拓扑与主机变量见 `tob242/HARBOR_HANDOFF.md`。

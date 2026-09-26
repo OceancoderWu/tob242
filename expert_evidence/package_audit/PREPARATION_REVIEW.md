@@ -1,26 +1,23 @@
 # ToB 242 准备工作复核
 
-本轮按用户要求只修文件与静态接线，**没有启动模型训练、smoke、评分、Docker 构建、Harbor Trial 或 Agent 研究**。此前的 `qa-reviews/tob242-2026-09-26/` 是修复前报告，不能当成当前版本结论。
+本轮按用户指定拓扑修复：Harbor/Docker 在本机，两个镜像都只需 CPU；代码、数据、CUDA 环境、训练与正式评分在远端 GPU 服务器。**未启动模型训练、smoke、Docker build、Harbor Trial 或 Agent 研究。**
 
-## 已修复的准备项
+## 已完成
 
-| 范围 | 当前文件和边界 |
+| 范围 | 当前实现 |
 |---|---|
-| Agent 起点与 Oracle | `environment/starter/method.py` 是 R-GCN；Agent 镜像将它复制到 `/workspace/solution/method.py`。任务根 `solution/method.py` 是与 `workspace/reference/method.py` 相同的私有 Reference，只在 Harbor Oracle 运行时上传。`solve.sh` 无参数可调用。 |
-| Harbor 配置 | `task.toml` 按本机 Harbor 0.23.0 的 schema 声明 1 GPU、无网络、独立 Verifier 和唯一方法 artifact；`TaskConfig` 加载、`Task.is_valid_dir` 静态检查通过。 |
-| 两套构建上下文 | Agent 从 `environment/Dockerfile` 构建，只有公开训练 CSV、Starter、题面和公开验证工具；独立 Verifier 从 `tests/Dockerfile` 构建，包含原始 24 组测试 CSV、可信代码、相同公开训练协议。两套 COPY 来源均在各自上下文内。 |
-| 测试隔离 | 测试 CSV 在 Verifier 镜像构建时设为 root 独占，Agent 容器没有这些文件。Verifier 仅接收方法 artifact，固定其权限；候选训练和推理由普通用户进程执行，root 进程单独读取标签与计算分数。静态 AST 检查是补充，不被当成完整 Python 沙箱。 |
-| Public/Dev | `solution/solve.sh` 和 `tests/train_eval.py --public-dev` 只使用公开训练 CSV 的训练、验证划分；无需锚点与测试文件。Agent 日常迭代可只跑一个 seed。 |
-| 正式评分 | `/tests/test.sh` 接通合同检查、固定 seed 42 grader、24 组宏平均、归一化 score 和原子 reward；先清理旧的 txt/json reward。失败时不能留下旧分数。 |
-| 证据模板 | `expert_evidence/run_pair.sh`、`package_run.py`、`summarize.py` 能按冻结协议记录 Baseline/Reference 的逐 seed 训练、重载、模型哈希与统计；没有真实结果时不生成正式锚点。 |
-| 数据与镜像一致性 | `preflight.py` 只读检查训练/测试 CSV SHA-256、两套公开资产镜像、题面和脚本副本、Python 语法、Docker COPY 来源。具体逐项结果见 `static_preflight.json`。 |
+| Agent/Oracle 边界 | Agent 镜像从公开 R-GCN Starter 初始化；Oracle 方法仍在 Harbor `solution/`，并与出题方 Reference 相同。只声明最终 `method.py` artifact。 |
+| Harbor 资源与网络 | `task.toml` 声明本机 `gpus=0`、出站网络、独立 Verifier；Agent key 与 Verifier key 分别由主机变量注入。Harbor 0.23.0 schema 静态加载通过。 |
+| 本机镜像 | 两个 Dockerfile 都改为 CPU SSH 客户端镜像，不安装 CUDA、PyTorch 或 PyG。Agent 构建上下文不含测试 CSV 或 Reference。 |
+| 远端公开入口 | `remote_runtime/public/run.sh` 接收候选方法，作为 `researcher` 使用远端固定 CUDA Python 运行 public-dev/smoke；CLI 返回日志并复制三个公开结果文件。公开训练器 root 拥有、只读。 |
+| 远端正式入口 | `remote_runtime/private/verify.sh` 接收最终方法与可信锚点，以 root 启动固定 grader；候选训练/推理切换 `researcher`，测试 CSV 目录为 0700。评分标量返还本机独立 Verifier。 |
+| SSH 隔离 | Agent key 可执行任意远端 shell 命令，但强制入口先降权为 `researcher`。旧 Reference 所在目录及其他非公开工作目录为 0700，`researcher` 读取正式测试被拒绝。Verifier 专用 root key 不在 Agent 镜像或其环境变量中。SSH host key 已固定。 |
+| 静态一致性 | 数据 SHA-256、镜像源文件、题面/脚本副本、Python/Bash 语法及合同检查均已完成；结果见 `static_preflight.json`。 |
 
-单 seed 版本的只读静态复核：`preflight.py` 的 105 项检查全部通过，结果见 `static_preflight.json`；`test_contract.py` 的 3 项文件/协议检查通过；Harbor 0.23.0 的 `TaskConfig.model_validate_toml` 与 `Task.is_valid_dir` 通过。这些检查不构建镜像，也不证明实际运行成功。
+## 尚待获准实验后验证
 
-## 仍需实验阶段的真实证据
+1. 当前单 seed 42 的 Baseline/Reference 成对训练、独立重载和 24 组测试证据；可信锚点 `tests/anchors.json` 尚未生成。因此正式入口目前会明确失败。
+2. 本机两套 CPU Docker 镜像构建、Agent/Verifier 容器内 SSH、Harbor artifact 转交、正式 reward、资源与时限、12 小时稳定性。
+3. 两条真实 Agent AutoResearch 轨迹。单 seed 不能验证教程的 `3σ_B` 随机性门槛，需要任务方接受偏离。
 
-1. 在 Linux CUDA 容器构建两套镜像，核对依赖安装、artifact 转交、`runuser`、文件权限及拒绝越权读取的负例。
-2. 真实执行一次 Public/Dev，再完成固定 seed 42 的 Baseline/Reference 成对训练、独立重载和全 24 组评分；据此确认 Baseline 公平、Reference 分数落在 `[0.15,0.8]` 且严格优于 Baseline。当前 `anchors.json` 不存在。单 seed 无法提供教程要求的 `3σ_B` 证据，任务方需接受这一偏离。
-3. 在冻结任务上完成两条各至少 10 小时的独立 Agent 研究轨迹、最佳方法复评，以及真实 Harbor Trial、资源/时限和 12 小时稳定性检查。
-
-这三个部分均受本轮“禁止开始任何实验”的指令约束，保持未运行状态。当前版本只能称为**静态准备完成，正式投放未验收**。原始论文测试题已经公开；进程隔离不等于新建未公开 Hidden。旧单 seed 试跑采用另一协议，不作为本题锚点。
+原始论文测试题本来公开；运行时权限隔离不能把它们变成新建未公开 Hidden。当前结论为**静态接线完成，端到端验收未完成**。

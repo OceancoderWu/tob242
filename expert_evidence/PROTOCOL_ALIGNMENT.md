@@ -42,4 +42,4 @@
 
 原始 benchmark 优先，不为制造分差削弱 Baseline，不换测试题，不根据 Reference 分数反推评分上界。当前固定 seed 42；若 Reference 归一化分数不在 [0.15,0.8] 或没有严格优于 Baseline，明确记录不通过。单 seed 不能计算 Baseline 样本标准差，因而不能满足教程的 `3σ_B` 随机性质量门；须由任务方明确接受这一偏离。保持数据与结果，不根据分数改 seed 或评分上界。
 
-正式 10h×2 Agent 研究轨迹和实际 Harbor 平台验证仍需真实运行，不能从模板生成假结果。当前独立 Verifier 版 `task.toml` 已按本机 Harbor 0.23.0 原生 schema 改写并通过静态加载；此前的 `shared` 版曾通过 dry-run，当前版尚未执行。镜像构建、GPU 正式评分及平台隔离尚未完成动态验证。
+正式 10h×2 Agent 研究轨迹和实际 Harbor 平台验证仍需真实运行，不能从模板生成假结果。当前独立 Verifier 版 `task.toml` 已按本机 Harbor 0.23.0 原生 schema 改写，并以本机 CPU Docker 经 SSH 调用远端 GPU 的拓扑通过静态加载；此前的 `shared` 版曾通过 dry-run，当前版尚未执行。镜像构建、远端 GPU 正式评分及平台隔离尚未完成动态验证。

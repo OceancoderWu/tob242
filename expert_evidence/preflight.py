@@ -56,10 +56,16 @@ def main():
     check('artifact_boundary', config.get('artifacts') == [dict(
         source='/workspace/solution/method.py', destination='submitted_method.py')],
           'Only method.py is declared; test.sh rejects nonempty convention artifacts')
-    check('resource_contract', config['environment']['gpus'] == 1 and
-          config['environment']['network_mode'] == 'no-network' and
-          config['verifier']['user'] == 'root',
-          'One GPU, no runtime network, root verifier')
+    check('resource_contract', config['environment']['gpus'] == 0 and
+          config['environment']['network_mode'] == 'public' and
+          config['verifier']['user'] == 'root' and
+          config['verifier']['environment_mode'] == 'separate',
+          'Local CPU bridge with SSH/model network and separate root verifier')
+    check('ssh_identity_separation',
+          config['environment']['env'].get('T242_AGENT_KEY_B64') == '${T242_AGENT_KEY_B64}' and
+          config['verifier']['env'].get('T242_VERIFIER_KEY_B64') == '${T242_VERIFIER_KEY_B64}' and
+          'T242_VERIFIER_KEY_B64' not in config['environment']['env'],
+          'Agent and verifier keys are supplied by the host in different phases')
     check('seed_contract', protocol['seeds'] == [42],
           'One predeclared seed for training and formal evaluation')
     check('agent_starter',
@@ -86,7 +92,8 @@ def main():
     check('agent_dockerfile_mirror', digest(AGENT / 'Dockerfile') ==
           digest(VERIFIER / 'agent_Dockerfile'), 'Verifier contract copy matches Agent Dockerfile')
 
-    public_runner = ('train_eval.py', 'data.py', 'security.py', 'score.py')
+    public_runner = ('train_eval.py', 'data.py', 'security.py', 'score.py',
+                     'remote_client.sh', 'sync_method_from_remote.sh')
     for name in public_runner:
         expected = digest(TESTS / name)
         check('runner_' + name,
@@ -120,6 +127,10 @@ def main():
                   'Verifier copy matches the expert source CSV')
     check('agent_excludes_tests', not any((AGENT / 'public_assets/data').glob('test_*.csv')),
           'Agent image context has no test CSV')
+    check('ssh_host_key_mirror', digest(AGENT / 'known_hosts') ==
+          digest(VERIFIER / 'known_hosts') and
+          'connect.bjb1.seetacloud.com' in (AGENT / 'known_hosts').read_text(),
+          'Both images pin the same known SSH server key')
     check('reference_outside_task', not (TASK / 'reference').exists() and
           (ROOT / 'workspace/reference/method.py').is_file(),
           'Reference is outside both Harbor build contexts')
@@ -154,7 +165,7 @@ def main():
     if not (ROOT / 'expert_evidence/trajectory_codex.json').is_file():
         pending.append('two real Agent research trajectories')
     pending.append('single-seed protocol cannot establish tutorial 3-sigma randomness gate')
-    pending.append('GPU image build, permission probe, full Harbor Trial, resource and 12h checks')
+    pending.append('CPU bridge image build, in-container SSH probe, full Harbor Trial, resource and 12h checks')
     report = dict(status='STATIC_READY' if all(item['passed'] for item in checks) else 'STATIC_FAILED',
                   scope='Read-only file/schema/syntax inspection; no model execution or experiment',
                   checks=checks, pending_runtime_evidence=pending)

@@ -15,7 +15,12 @@
     {
       "name": "resource_contract",
       "passed": true,
-      "detail": "One GPU, no runtime network, root verifier"
+      "detail": "Local CPU bridge with SSH/model network and separate root verifier"
+    },
+    {
+      "name": "ssh_identity_separation",
+      "passed": true,
+      "detail": "Agent and verifier keys are supplied by the host in different phases"
     },
     {
       "name": "seed_contract",
@@ -84,6 +89,16 @@
     },
     {
       "name": "runner_score.py",
+      "passed": true,
+      "detail": "Agent and Verifier public runner mirrors match the trusted source"
+    },
+    {
+      "name": "runner_remote_client.sh",
+      "passed": true,
+      "detail": "Agent and Verifier public runner mirrors match the trusted source"
+    },
+    {
+      "name": "runner_sync_method_from_remote.sh",
       "passed": true,
       "detail": "Agent and Verifier public runner mirrors match the trusted source"
     },
@@ -373,6 +388,11 @@
       "detail": "Agent image context has no test CSV"
     },
     {
+      "name": "ssh_host_key_mirror",
+      "passed": true,
+      "detail": "Both images pin the same known SSH server key"
+    },
+    {
       "name": "reference_outside_task",
       "passed": true,
       "detail": "Reference is outside both Harbor build contexts"
@@ -438,31 +458,6 @@
       "detail": "Python syntax parses without executing imports"
     },
     {
-      "name": "syntax_workspace/harbor_task/tests/verifier_env/starter/method.py",
-      "passed": true,
-      "detail": "Python syntax parses without executing imports"
-    },
-    {
-      "name": "syntax_workspace/harbor_task/tests/verifier_env/public_runner/security.py",
-      "passed": true,
-      "detail": "Python syntax parses without executing imports"
-    },
-    {
-      "name": "syntax_workspace/harbor_task/tests/verifier_env/public_runner/data.py",
-      "passed": true,
-      "detail": "Python syntax parses without executing imports"
-    },
-    {
-      "name": "syntax_workspace/harbor_task/tests/verifier_env/public_runner/train_eval.py",
-      "passed": true,
-      "detail": "Python syntax parses without executing imports"
-    },
-    {
-      "name": "syntax_workspace/harbor_task/tests/verifier_env/public_runner/score.py",
-      "passed": true,
-      "detail": "Python syntax parses without executing imports"
-    },
-    {
       "name": "syntax_workspace/harbor_task/solution/method.py",
       "passed": true,
       "detail": "Python syntax parses without executing imports"
@@ -489,6 +484,31 @@
     },
     {
       "name": "syntax_workspace/harbor_task/environment/public_runner/score.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/tests/verifier_env/starter/method.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/tests/verifier_env/public_runner/security.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/tests/verifier_env/public_runner/data.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/tests/verifier_env/public_runner/train_eval.py",
+      "passed": true,
+      "detail": "Python syntax parses without executing imports"
+    },
+    {
+      "name": "syntax_workspace/harbor_task/tests/verifier_env/public_runner/score.py",
       "passed": true,
       "detail": "Python syntax parses without executing imports"
     },
@@ -532,6 +552,6 @@
     "measured Baseline/Reference anchors and paired GPU evidence",
     "two real Agent research trajectories",
     "single-seed protocol cannot establish tutorial 3-sigma randomness gate",
-    "GPU image build, permission probe, full Harbor Trial, resource and 12h checks"
+    "CPU bridge image build, in-container SSH probe, full Harbor Trial, resource and 12h checks"
   ]
 }

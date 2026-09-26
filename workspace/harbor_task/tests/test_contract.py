@@ -22,7 +22,8 @@ class PreparationContract(unittest.TestCase):
         self.assertFalse((TASK/'reference').exists())
         self.assertNotIn('workspace/reference', (TASK/'environment/Dockerfile').read_text())
         check_method(TASK/'solution/method.py')
-        for name in ('train_eval.py','data.py','security.py','score.py'):
+        for name in ('train_eval.py','data.py','security.py','score.py',
+                     'remote_client.sh','sync_method_from_remote.sh'):
             self.assertEqual((TASK/'environment/public_runner'/name).read_bytes(),
                              (TASK/'tests'/name).read_bytes(),name)
             self.assertEqual((TASK/'environment/public_runner'/name).read_bytes(),

@@ -34,13 +34,13 @@ def training_loss(logits, targets):
     ...
 ```
 
-`model(graph)` 返回 `[B,8]` 的有限 logits。`graph` 只含 `edge_index[2,E]`、`edge_type[E]`、`query_index[2,B]`、`batch[N]`、`num_nodes`；标签只传给 `training_loss`。图张量已放到 GPU。`num_steps=9` 和 Starter 的表示宽度 32 是起始设置，不限制合法结构探索；模型参数总数必须不超过 2,000,000。只能使用预装的 PyTorch、PyG、torch-scatter、NetworkX、typing 和 math，不能下载模型或添加外部权重。
+`model(graph)` 返回 `[B,8]` 的有限 logits。`graph` 只含 `edge_index[2,E]`、`edge_type[E]`、`query_index[2,B]`、`batch[N]`、`num_nodes`；标签只传给 `training_loss`。图张量在远端训练进程中放到 GPU；本机 Harbor 容器不申请 GPU。`num_steps=9` 和 Starter 的表示宽度 32 是起始设置，不限制合法结构探索；模型参数总数必须不超过 2,000,000。只能使用远端预装的 PyTorch、PyG、torch-scatter、NetworkX、typing 和 math，不能下载模型或添加外部权重。
 
 ## 5. 硬边界与统一实验参数
 
 正式评测使用 seed `42`、40 epochs、batch size 128、Adam、learning rate 0.01、weight decay 0；不使用 scheduler 或梯度裁剪。数据划分和样本顺序由共同训练器确定，Baseline 与候选遵守同一规则，均从头初始化。总参数量上限 2,000,000；训练进程上限 7,200 秒，正式 Verifier 总上限见 `task.toml`。
 
-不能修改训练器、评分器、测试资产、协议和锚点，不能通过提交方法读取文件、环境变量、网络、外部进程或测试答案；不能硬编码测试题或逐题结果。Harbor 将最终 `method.py` 作为唯一候选 artifact 送入独立 Verifier 容器。Verifier 会拒绝非白名单导入及常见文件、进程 API；测试文件仅 root 可读，候选在低权限子进程中训练和推理。检测到越界或输出格式错误时评分失败。运行时网络关闭。
+不能修改训练器、评分器、测试资产、协议和锚点，不能通过提交方法读取文件、环境变量、网络、外部进程或测试答案；不能硬编码测试题或逐题结果。Harbor 将最终 `method.py` 作为唯一候选 artifact 送入独立 Verifier 容器。Verifier 会拒绝非白名单导入及常见文件、进程 API；远端正式测试文件仅 root 可读，候选在远端低权限子进程中训练和推理。检测到越界或输出格式错误时评分失败。容器网络用于 SSH 和 Agent 模型服务；模型代码本身不能访问网络。
 
 ## 6. 提交要求
 
@@ -55,16 +55,26 @@ bash solution/solve.sh output/dev42 42
 公开接口 smoke：
 
 ```bash
-python tests/train_eval.py --method solution/method.py --seed 42 --smoke --output output/smoke42
+bash solution/solve.sh output/smoke42 42 smoke
 ```
 
-这两个命令均只需公开训练 CSV，不需要正式测试资产或评分锚点。
+这两个命令由本机容器通过 SSH 将本机当前 `method.py` 发给远端 GPU 服务器；训练日志直接返回命令行，`result.json`、`provenance.json` 和 `epochs.jsonl` 会复制到本机指定输出目录。远端完整输出（含 checkpoint）留在 `/root/autodl-tmp/autore/harbor242-public/output/<目录名>`。容器内的 `tests/train_eval.py` 只供阅读协议，不能在本机直接运行训练。上述两个入口只使用公开训练 CSV，不需要正式测试资产或评分锚点。运行前，任务方需向 Harbor 注入 `T242_AGENT_KEY_B64`；不要把 SSH 私钥写进 `method.py` 或题包。
+
+你也可以直接通过 SSH 在 GPU 服务器上运行任意普通用户命令，例如查看 GPU、编辑公开工作区中的方法、检查日志或运行公开训练器：
+
+```bash
+bash tests/remote_client.sh agent 'pwd; nvidia-smi'
+bash tests/remote_client.sh agent 'cat /root/autodl-tmp/autore/harbor242-public/solution/method.py | /root/autodl-tmp/autore/harbor242-public/run.sh public-dev dev42 42'
+bash tests/sync_method_from_remote.sh
+```
+
+SSH 命令以远端 `researcher` 身份执行。若你直接修改了远端 `solution/method.py`，最后必须运行 `sync_method_from_remote.sh`，让 Harbor 提交的本机 `/workspace/solution/method.py` 与远端方法一致。`solution/solve.sh` 会用本机方法覆盖远端方法，适合在本机编辑方法的流程。
 
 ## 7. 迭代流程
 
 先跑 smoke 确认接口，再在公开验证集上完成一次训练。每轮改动后比较验证准确率、逐轮训练日志、显存和耗时；保留当前最佳 `method.py`，效果退化时回退，再探索下一种方法。公开验证集可用于研究迭代；正式 24 组测试只由 Verifier 对最终提交评分，不向 Agent 提供逐题标签。
 
-Agent 可使用容器内的 Python、shell 与已安装包，不能联网或安装额外依赖。单轮耗时取决于方法；本任务提供 12 小时 Agent 总时限。输出保存在 `/workspace/output`，不得覆盖其他轮次目录。
+Agent 可使用容器内的 shell 和 SSH 客户端，在远端 `researcher` 账号下执行普通命令、运行已部署的 Python、PyTorch 和其他固定依赖。远端公开工作区的 `solution/`、`output/` 与账号主目录可写，固定训练器、正式测试及出题方 Reference 不可改；不能安装额外依赖。单轮耗时取决于方法；本任务提供 12 小时 Agent 总时限。每轮指定不同的输出目录，不得覆盖其他轮次目录。
 
 ## 8. 完成条件
 

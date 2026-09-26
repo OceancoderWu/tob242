@@ -2,7 +2,7 @@ schema_version = "1.4"
 
 [task]
 name = "autoresearch/rcc8-cross-length-generalization"
-version = "0.3.0"
+version = "0.4.0"
 description = "Improve RCC-8 relation prediction on the original STaR benchmark."
 
 [metadata]
@@ -10,13 +10,16 @@ category = "machine-learning"
 difficulty_explanation = "Method-level graph reasoning search with one fixed training seed."
 
 [environment]
-cpus = 8
-memory_mb = 16384
-storage_mb = 102400
-gpus = 1
+cpus = 2
+memory_mb = 4096
+storage_mb = 2048
+gpus = 0
 build_timeout_sec = 3600
-network_mode = "no-network"
+network_mode = "public"
 workdir = "/workspace"
+
+[environment.env]
+T242_AGENT_KEY_B64 = "${T242_AGENT_KEY_B64}"
 
 [agent]
 timeout_sec = 43200
@@ -25,6 +28,9 @@ timeout_sec = 43200
 timeout_sec = 25200
 user = "root"
 environment_mode = "separate"
+
+[verifier.env]
+T242_VERIFIER_KEY_B64 = "${T242_VERIFIER_KEY_B64}"
 
 [[artifacts]]
 source = "/workspace/solution/method.py"

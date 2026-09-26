@@ -1,50 +1,30 @@
 # ToB 242 RCC-8 AutoResearch 任务包
 
-本包使用作者发布的原始训练 CSV 和 Figure 4 对应的 24 组 RCC-8 测试 CSV。Agent 改进 `/workspace/solution/method.py` 中的图关系推理方法；训练和评分协议由任务固定。论文逐组 accuracy 与本题测试题一致；全 24 组宏平均和归一化 `score=(A-B)/(1-B)` 是 AutoResearch 新增的标量合同。Baseline 是查询感知 R-GCN 适配，Reference 是作者 EpiGNN-min 适配，二者并非论文代码逐 bit 复现。
+本题用作者发布的训练 CSV 与 Figure 4 的 24 组 RCC-8 测试 CSV。Agent 只提交 `method.py` 来改进图关系推理；固定 seed 42 的全 24 组等权宏平均是主指标。归一化 `score=(A-B)/(1-B)` 是本题的 AutoResearch 评分约定，不是论文指标。Baseline 为查询感知 R-GCN 适配，Reference 为 EpiGNN-min 适配，均非逐 bit 论文复现。
+
+## 运行拓扑
+
+Harbor 和 Docker 在本机，构建 Agent 与独立 Verifier 的 CPU 容器。GPU 服务器保有代码、数据、CUDA Python、训练过程和 checkpoint。Agent 可通过 SSH 以低权限用户执行任意远端 shell 命令、编辑方法、训练并读取日志；独立 Verifier 使用另一把 SSH key 在远端执行正式评分。具体目录、身份配置和启动前环境变量见 [HARBOR_HANDOFF.md](HARBOR_HANDOFF.md)。Agent 的 `-a`、`-m` 和模型认证由任务方准备。
+
+- `workspace/harbor_task/` 是交给 Harbor 的任务根；Agent 镜像从 `environment/` 构建，只含公开训练资产、R-GCN Starter 和 SSH 客户端。
+- `workspace/harbor_task/solution/` 是 Oracle 专用 Reference 和入口；普通 Agent 镜像中的方法从公开 Starter 初始化。Harbor 的唯一提交 artifact 是 `method.py`。
+- `workspace/harbor_task/tests/` 构建独立 Verifier 镜像，含可信评分代码与原始 24 组测试 CSV。服务器上对应目录由 root 管理，测试数据仅 root 可读。
+- `workspace/reference/` 是出题方 Reference，不在 Agent 构建上下文。
+- `optimization_evidence/`、`expert_evidence/` 保存未来实测的成对证据与研究轨迹；不能以空目录代替结果。
 
 ## 当前状态
 
-评分代码、公开验证入口和 Harbor 0.23.0 配置已完成静态接线，**正式投放仍待真实 GPU 证据**。正式协议现为固定 seed 42；`optimization_evidence/` 当前没有该协议的 Baseline/Reference 成对结果、checkpoint 和测得的锚点。`tests/anchors.json` 只有通过正式证据质量门后才由 `expert_evidence/summarize.py` 生成。两条 Agent 轨迹也未开展。不要把当前包或历史单 seed 试跑标成验收通过。
+已完成本机 Harbor 0.23.0 schema 解析、109 项静态预检、3 项文件合同检查，以及远端 SSH 身份与权限的非训练检查。未运行模型训练、smoke、Docker build、Harbor Trial 或 Agent 研究。当前 `tests/anchors.json` 不存在，正式 Verifier 会失败，不会产生 reward。静态检查只说明题包结构自洽，不代表端到端验收通过。
 
-本轮仅修准备工作，未启动任何实验。逐项静态结果见 `expert_evidence/package_audit/static_preflight.json`，修复与待实验项见 `expert_evidence/package_audit/PREPARATION_REVIEW.md`。
-
-## 目录边界
-
-- `workspace/harbor_task/`：交给 Harbor 的任务根。Agent 镜像从 `environment/` 构建，包含公开训练 CSV、只读公开训练器和 R-GCN 起点。
-- `workspace/harbor_task/solution/`：仅 Harbor Oracle 调用的私有 Reference 方法与无参入口；常规 Agent 镜像中的 `/workspace/solution/method.py` 仍从 R-GCN Starter 初始化。
-- `workspace/harbor_task/tests/benchmark_data/`：原始 24 个公开测试 CSV 的 Verifier 侧副本。Harbor 从 `tests/Dockerfile` 构建独立评分镜像；测试目录在镜像构建时即设为 root 独占，候选训练与推理以 `researcher` 运行，测试标签只在 root 评分进程中使用。
-- `workspace/harbor_task/tests/hidden_assets/`：交付时为空。原始论文测试题已公开，本题不声称另有未公开 Hidden。
-- `workspace/reference/`：出题方私有 Reference，不在 Agent 构建上下文。
-- `optimization_evidence/`：全部正式 Baseline/Reference seed 的训练、模型、重载和统计材料。
-- `expert_evidence/`：来源审计、协议说明、出题记录及未来两条 Agent 轨迹。
-
-## 本地与 Harbor 检查
-
-本机已用 Harbor 0.23.0 的 `TaskConfig.model_validate_toml` 加载当前 `task.toml`；旧 `shared` 配置曾通过 dry-run，但不能作为当前独立 Verifier 配置的运行证据。目标环境是 Linux x86_64、CUDA 11.8 兼容 GPU。原生 Docker provider 分别以 `environment/` 和 `tests/` 为 Agent、Verifier 构建上下文：
-
-```bash
-docker build --platform linux/amd64 -t tob242-rcc8:0.2 -f workspace/harbor_task/environment/Dockerfile workspace/harbor_task/environment
-docker build --platform linux/amd64 -t tob242-rcc8-verifier:0.2 -f workspace/harbor_task/tests/Dockerfile workspace/harbor_task/tests
-```
-
-公开迭代在 Agent 容器中运行，不需测试文件与锚点：
+公开迭代入口在 Agent 容器中：
 
 ```bash
 bash /workspace/solution/solve.sh /workspace/output/dev42 42
-python /workspace/tests/train_eval.py --method /workspace/solution/method.py --seed 42 --smoke --output /workspace/output/smoke42
+bash /workspace/solution/solve.sh /workspace/output/smoke42 42 smoke
 ```
 
-正式 Harbor Verifier 在独立容器运行 `/tests/test.sh`。Harbor 只转交 Agent 最终的 `/workspace/solution/method.py` artifact；Verifier 固定该文件权限，再用 root 读取测试数据，按固定 seed 42 从头训练候选并经低权限推理进程取得预测，最后原子写 `/logs/verifier/reward.txt`。所有测试文件会校验 SHA-256；模型代码和测试标签不在同一进程。公开题库本身可能被外部获得，这一运行隔离不能改变原始数据的公开性质。
+这些命令通过 SSH 在远端执行，日志会回到命令行。本机输出目录只收集结果与逐轮日志，远端保留完整 checkpoint。正式 Verifier 在独立容器运行 `/tests/test.sh`，把最终方法送到远端从头训练与评分，最终写 `/logs/verifier/reward.txt`。
 
-## 正式证据生成
+## 尚需在获准实验后完成
 
-在有 GPU 的受控环境、与任务相同的软件和数据版本下运行：
-
-```bash
-cd tob242
-PYTHON=/path/to/python bash expert_evidence/run_pair.sh
-```
-
-脚本以 seed 42 分别从头训练 Baseline 和 Reference，独立重载，对齐数据划分并生成规范 `result.json`、日志、`model/`。`summarize.py` 复算单次主指标、改善和归一化 Reference 分数。仅当两次训练完整、Reference 严格优于 Baseline 且归一化分数处于 `[0.15,0.8]` 时，才部署测得的 `tests/anchors.json`。单 seed 无法估计随机波动，也不能满足原教程的 `3σ_B` 证据要求；失败结果保留，不能换 seed 或调上界制造通过。
-
-锚点生成后，还需实测 Docker 构建、GPU 完整评分、Harbor Trial、资源/时长、容器 12 小时稳定性和两条各至少 10 小时有效研究轨迹。最终状态以 `expert_evidence/run_summary.json` 和真实运行材料为准。
+用同一冻结协议和 seed 42 实测 Baseline 与 Reference、独立重载并生成可信 `anchors.json`；再验证 CPU 镜像构建、Harbor artifact 交接、完整远端评分、资源/时限、12 小时稳定性和两条真实 Agent 研究轨迹。单 seed 无法估计跨运行波动，也不能满足原教程的 `3σ_B` 随机性门槛，这一协议偏离需由任务方接受。历史其他协议的试跑不能作为本题锚点。
